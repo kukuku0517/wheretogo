@@ -1,0 +1,10 @@
+<h1>Post#index</h1>
+<p>Find me in app/views/post/index.html.erb</p>
+
+<%=link_to 'create',create_path,method: :get%>
+
+<%@post.each do |post|%>
+    <%=link_to show_path(post.id) do%>
+        <%=post.id%>
+    <%end%>
+<%end%>
