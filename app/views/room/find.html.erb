@@ -1,0 +1,140 @@
+<script type="text/javascript" src="//apis.daum.net/maps/maps3.js?apikey=e78e73fb03c7df3623d3f3aeaece86a3"></script>
+
+<div class="users">
+  <% @places.each do |place| %>
+  <div class = "user<%=place.user_id%>">
+    <%= form_tag(places_create_path(place.room_id, place.user_id), method:"post") do %>
+    [USER = <%=place.user_id%>] 위도 : <input type="text" name="lat" class="lat" value=<%=place.lat%>>
+    경도 : <input type="text" name="lon" class="lon" value=<%=place.lng%>>
+    <% if place.user_id==@user_id %>
+    <input type="submit" id="submit" value="확인">
+    <%= link_to '다시 지정하기', places_refresh_path(place.room_id) %>
+    <% end %>
+    <% if place.check ==1 %>
+    <i class="fa fa-check" aria-hidden="true"></i>
+      <% end %>
+    <% end %>
+  </div>
+  <% end %>
+</div>
+
+<div id="map" style="width:500px;height:400px;"></div>
+<% if @count == @check.size %>
+<button href="" id="find">중간지점 찾기</button>
+<% end %>
+
+<script>
+$(document).ready(function(){
+  
+  var container = document.getElementById('map'); //지도를 담을 영역의 DOM 레퍼런스
+  var options = { //지도를 생성할 때 필요한 기본 옵션
+    center: new daum.maps.LatLng(33.450701, 126.570667), //지도의 중심좌표.
+    level: 7 //지도의 레벨(확대, 축소 정도)
+  };
+  var map = new daum.maps.Map(container, options); //지도 생성 및 객체 리턴
+  
+  var marker = new daum.maps.Marker({ 
+    map: map
+  }); 
+  
+  var user_lat = $(".user<%=@user_id%>").find(".lat");
+  var user_lng = $(".user<%=@user_id%>").find(".lon");
+  var has_pos = user_lat.val()==""||user_lng.val()==""?true:false;
+  
+
+  //자기위치가 있으면 그곳에 마커, 아니면 위치받아서 마커
+  if(!has_pos){
+    var markerPosition = new daum.maps.LatLng(user_lat.val(), user_lng.val());
+    marker.setPosition(markerPosition);
+    marker.setMap(map);
+    map.setCenter(markerPosition);
+  }else if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(function(position){
+    var lat = position.coords.latitude.toFixed(4);
+    var lng = position.coords.longitude.toFixed(4);
+    user_lat.val(lat);
+    user_lng.val(lng);
+    
+    var geoPosition = new daum.maps.LatLng(lat, lng);
+    marker.setPosition(geoPosition);
+    marker.setMap(map);
+    map.setCenter(geoPosition);
+    });
+  }
+  
+  //확인눌렀으면 click이벤트가 발생하지 않게
+  daum.maps.event.addListener(map, 'click', function(mouseEvent) {
+    var is_check = false;
+    <% @check.each do |c| %>
+    if(<%=c.user_id%>==<%=@user_id%>){
+      is_check = true;
+    }
+    <% end %>
+    if(!is_check){
+      var latlng = mouseEvent.latLng; 
+      marker.setPosition(latlng);
+      
+      user_lat.val(latlng.getLat().toFixed(4));
+      user_lng.val(latlng.getLng().toFixed(4));
+    }
+  });
+
+  
+  //인원의 위치가 다 채워지면 각각의 위치에 마커 표시
+  if(<%=@check.size%>==<%=@count%>){
+    var markers = [];
+    var iwContents = [];
+    <% @check.each do |c| %>
+      var marker = new daum.maps.Marker({
+        map: map
+      });
+      var lat = <%=c.lat%>;
+      var lng = <%=c.lng%>;
+      
+      marker.setPosition(new daum.maps.LatLng(lat, lng));
+      
+      var iwContent = new daum.maps.InfoWindow({
+        position: marker.getPosition(),
+        content: "User"+<%=c.user_id%>
+      });
+      
+      marker.setMap(map);
+      iwContent.open(map, marker);
+      markers.push(marker);
+      iwContents.push(iwContent);
+    <% end %>
+    console.log(markers);
+  }
+
+
+  //중간 지점을 저장할 배열
+  var midPoint = [];
+  
+  //중간지점을 찾는 함수
+  $('#find').click(function findMidPosition() {
+
+    var midPosLat = 0, midPosLng = 0;
+    for(var i=0;i<markers.length;i++){
+      midPosLat += markers[i].getPosition().getLat();
+      midPosLng += markers[i].getPosition().getLng();
+    }
+    midPosLat = (midPosLat/markers.length).toFixed(4);
+    midPosLng = (midPosLng/markers.length).toFixed(4);
+    
+    var marker = new daum.maps.Marker({
+      map: map
+    });
+    
+    var midiwContent = new daum.maps.InfoWindow({
+      position: marker.getPosition(),
+      content: "중간지점 : "+marker.getPosition().getLat().toFixed(4)+ ", "+marker.getPosition().getLng().toFixed(4)
+    });
+    
+    marker.setPosition(new daum.maps.LatLng(midPosLat, midPosLng));
+    midPoint.push(marker);
+    marker.setMap(map);
+    map.setCenter(marker.getPosition());
+    midiwContent.open(map, marker);
+  });
+});
+</script>

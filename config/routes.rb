@@ -1,12 +1,18 @@
 Rails.application.routes.draw do
-  root 'post#index'
-  get 'post/index' =>'post#index',as: :index
-
-  get 'post/create' =>'post#create',as: :create
-
-  get 'post/show/:id' =>'post#show',as: :show
   
-  get 'post/result/:id' =>'post#result',as: :result
+  root 'room#index'
+  
+  get 'room/index' => 'room#index',as: :index
+
+  get 'room/create'=> 'room#create',as: :create
+
+  get 'room/show/:id'=> 'room#show',as: :show
+  get 'room/find/:id'=> 'room#find',as: :find
+  get 'room/result/:id'=> 'room#result',as: :result
+  get 'room/result2/:id'=> 'room#result2',as: :result2
+ 
+  post 'room/find_temp/:id'=> 'room#find_temp',as: :find_temp
+
 
   devise_for :users, :controllers => { :omniauth_callbacks => "users/omniauth_callbacks" }
   

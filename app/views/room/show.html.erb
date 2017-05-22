@@ -1,0 +1,129 @@
+<h1>Post#show</h1>
+<p>Find me in app/views/post/show.html.erb</p>
+
+<script>
+$(document).ready(function(){
+       
+    var positions = [];
+    var center = [];
+      
+    function form_latlnghash(title,lat,lng){
+        
+        var LatLngHash = {};
+        LatLngHash["title"] = title;
+        LatLngHash["lat"] = lat;
+        LatLngHash["lng"] = lng;
+        return LatLngHash;
+        
+    }
+    
+    function update_latlng(index){
+         
+        var lat = $(this).find(".lat").val();
+        var lng = $(this).find(".lon").val();
+        
+        positions[index] = form_latlnghash("updated",lat,lng);
+    }
+    
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition);
+            
+        }
+    }
+    
+    function updateCenter(){
+        var SLat =0;
+        var SLng=0;
+        var pLen = positions.length;
+        for(var i=0;i<pLen;i++){
+            SLat+=positions[i].lat;
+            SLng+=positions[i].lng;
+        }
+        center=[SLat/pLen,SLng/pLen];
+    }
+    
+    function showPosition(position) {
+        
+        <%@room.places.each do |place|%>
+            var hash = form_latlnghash("new",<%=place.lat%>,<%=place.lng%>);
+            center.push(<%=place.lat%>);
+            center.push(<%=place.lng%>);
+            positions.push(hash);
+        <%end%>
+        updateCenter();
+        daum_map();
+    }
+    
+     $(".text").on('click',getLocation());
+     
+     
+     
+    function daum_map(){
+        console.log(center);
+        var mapContainer = document.getElementById('map'), // 지도를 표시할 div  
+        mapOption = { 
+            center: new daum.maps.LatLng(center[0], center[1]), // 지도의 중심좌표
+            level: 3 // 지도의 확대 레벨
+        };
+        
+        var map = new daum.maps.Map(mapContainer, mapOption); // 지도를 생성합니다
+         
+        // 마커를 표시할 위치와 title 객체 배열입니다 
+        
+        // 마커 이미지의 이미지 주소입니다
+        var imageSrc ='http://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_number_blue.png'; 
+        var bounds = new daum.maps.LatLngBounds();
+        
+        for (var i = 0; i < positions.length; i ++) {
+           
+            // 마커 이미지의 이미지 크기 입니다
+            var imageSize = new daum.maps.Size(24, 35); 
+            var placePosition =  new daum.maps.LatLng(parseFloat(positions[i].lat), parseFloat(positions[i].lng));
+            // // 마커 이미지를 생성합니다    
+            var markerImage = new daum.maps.MarkerImage(imageSrc, imageSize); 
+           
+            // 마커를 생성합니다
+            var marker = new daum.maps.Marker({
+                map: map, // 마커를 표시할 지도
+                position: placePosition, // 마커를 표시할 위치
+                title : positions[i].title, // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
+             // image : markerImage // 마커 이미지 
+            });
+            
+            bounds.extend(placePosition);
+        }
+        console.log(bounds);
+map.setBounds(bounds);    
+  marker = new daum.maps.Marker({
+        map: map, // 마커를 표시할 지도
+      
+        position: new daum.maps.LatLng(center[0],center[1]), // 마커를 표시할 위치
+        title : "center", // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
+     //   image : markerImage // 마커 이미지 
+    });
+   
+}
+});
+    
+    console.log(1);
+</script>
+<div class="users">
+<%@room.places.each do |place|%>
+    <div class="user<%=place.user_id%>">
+        <%=form_for place,url: find_temp_path(params[:id]),method: :post,:remote => true do |f|%>
+            <%=f.hidden_field :user_id, placeholder: place.user_id %>
+            <%=f.number_field :lat, class: "lat", placeholder: place.lat, step: "0.0000001"%>
+            <%=f.number_field :lng, class: "lng", placeholder: place.lng, step: "0.0000001"%>
+            <%if place.user_id ==current_user.id%>
+                <%=f.submit%>
+            <%end%>
+        <%end%>
+    </div>
+<%end%>
+</div>
+
+<!--<%=link_to 'find', find_temp_path,method: :post,:remote => true%>-->
+<div id="map" style="width:100%;height:350px;"></div>
+
+<%=link_to 'result', result_path(params[:id])%>
