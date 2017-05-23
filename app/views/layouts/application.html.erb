@@ -5,39 +5,17 @@
   <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
   <%= csrf_meta_tags %>
+  
+<script src="//developers.kakao.com/sdk/js/kakao.min.js"></script>
   <script type="text/javascript" src="//apis.daum.net/maps/maps3.js?apikey=e78e73fb03c7df3623d3f3aeaece86a3&libraries=services"></script>
 </head>
-<body>
+<body><% if user_signed_in? %>
+  <%= link_to('로그아웃', destroy_user_session_path, :method => :delete, :class => 'item borderless') %>
+<% else %>
+  <%= link_to('로그인', new_user_session_path, :class => 'item borderless') %>
+<% end %>
   <%=link_to 'MAIN', root_path%>
-<ul class="nav navbar-nav navbar-right">
-  <% if user_signed_in? %>
-    <li class="dropdown">
-      <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-        <%= image_tag(current_user.image, size: '20x20', style:'border-radius:3px;vertical-align:top;') if current_user.image %>
-        <%= current_user.name %>
-        <b class="caret"></b>
-      </a>
-      <ul class="dropdown-menu">
-        <li><%= link_to "My Profile", edit_user_registration_path %></li>
-       
-      </ul>
-    </li>
-    <li><%= link_to "Sign out", destroy_user_session_path, method: :delete, data: { confirm: "Are you sure?" } %></li>
-  <% else %>
-    <li class="dropdown">
-      <a href="#" class="dropdown-toggle" data-toggle="dropdown">Sign in
-       <b class="caret"></b></a>
-      <ul class="dropdown-menu">
-        <li><%= link_to "with Auth Blog", new_user_session_path %></li>
-        <li> <%= link_to "Sign in with Facebook", user_facebook_omniauth_authorize_path %></li>
-           </ul>
-    </li>
-    <li><%= link_to "Sign up", new_user_registration_path %></li>
-  
 
-
-  <% end %>
-</ul>
 <%= yield %>
 
 </body>

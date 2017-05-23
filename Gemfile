@@ -1,7 +1,12 @@
 source 'https://rubygems.org'
-
+gem 'clipboard-rails'
 gem 'devise', git: 'https://github.com/plataformatec/devise.git'
-gem 'omniauth-facebook'
+gem 'figaro'
+gem 'omniauth-oauth2', '~> 1.3.1'
+gem "omniauth-facebook"
+
+gem "omniauth-google-oauth2"
+gem 'omniauth-kakao'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.5'
 # Use sqlite3 as the database for Active Record
@@ -17,6 +22,7 @@ gem 'coffee-rails', '~> 4.1.0'
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
+gem 'jquery-turbolinks'
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder

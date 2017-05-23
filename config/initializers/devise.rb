@@ -199,7 +199,11 @@ Devise.setup do |config|
   #
   # Defines which key will be used when recovering the password for an account
   # config.reset_password_keys = [:email]
-config.omniauth :facebook, "1320177588091930", "1ae9efc3fbbcd088f2bad034fa0e3c95"
+
+config.omniauth :facebook, ENV["Facebook_Key"], ENV["Facebook_Secret"]
+# config.omniauth :facebook,ENV["FB_APP_ID"], ENV["FB_APP_SECRET"]
+config.omniauth :google_oauth2, ENV["Google_Key"], ENV["Google_Secret"]
+config.omniauth :kakao, ENV["Kakao_Key"], :redirect_path => "/users/auth/kakao/callback"
   # Time interval you can reset your password with a reset password key.
   # Don't put a too small interval or your users won't have the time to
   # change their passwords.
@@ -255,7 +259,7 @@ config.omniauth :facebook, "1320177588091930", "1ae9efc3fbbcd088f2bad034fa0e3c95
   # ==> Warden configuration
   # If you want to use other strategies, that are not supported by Devise, or
   # change the failure app, you can configure them inside the config.warden block.
-  #
+  # #
   # config.warden do |manager|
   #   manager.intercept_401 = false
   #   manager.default_strategies(scope: :user).unshift :some_external_strategy

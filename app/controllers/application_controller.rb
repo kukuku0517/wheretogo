@@ -8,9 +8,9 @@ class ApplicationController < ActionController::Base
     devise_parameter_sanitizer.permit(:account_update, keys: [:name])
     devise_parameter_sanitizer.permit(:sign_in) do |user_params|
       user_params.permit(:username, :name)
-      user_params.permit(:username, :provider)
-      user_params.permit(:username, :uid)
-      user_params.permit(:username, :image)
+      user_params.permit(:username, :profile_img)
+      
+      user_params.permit(:username, :nickname)
       
     end
   end

@@ -1,5 +1,13 @@
 Rails.application.routes.draw do
   
+  get 'register/info1'
+
+  get 'register/info2'
+  
+  post 'register/infoget' =>'register#infoget',as: :register_infoget
+
+  get 'visitor/main'
+
   root 'room#index'
   
   get 'room/index' => 'room#index',as: :index
@@ -8,11 +16,14 @@ Rails.application.routes.draw do
 
   get 'room/show/:id'=> 'room#show',as: :show
   get 'room/find/:id'=> 'room#find',as: :find
+  get 'room/destroy_member/:id' => 'room#destroy_member',as: :destroy_member
+  post 'room/save/:id' => 'room#save',as: :save
+  
   get 'room/result/:id'=> 'room#result',as: :result
   get 'room/result2/:id'=> 'room#result2',as: :result2
  
   post 'room/find_temp/:id'=> 'room#find_temp',as: :find_temp
-
+  post 'room/refresh' => 'room#refresh',as: :refresh
 
   devise_for :users, :controllers => { :omniauth_callbacks => "users/omniauth_callbacks" }
   

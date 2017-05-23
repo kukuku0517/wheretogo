@@ -1,8 +1,86 @@
 <h1>Post#show</h1>
 <p>Find me in app/views/post/show.html.erb</p>
 
+<div class="users">
+<%@room.places.each do |place|%>
+    <div class="user<%=place.user_id%>">
+        <%=form_for place,url: find_path(params[:id]),method: :get do |f|%>
+            <%=f.hidden_field :user_id, placeholder: place.user_id %>
+            <%=place.user_id%> :
+            <%=f.number_field :lat, class: "lat", placeholder: place.lat, step: "0.0000001"%>
+            <%=f.number_field :lng, class: "lng", placeholder: place.lng, step: "0.0000001"%>
+            <%if place.user_id ==current_user.id%>
+                <%=f.submit%>
+            <%end%>
+            <% if @creator && place.user_id!=current_user.id %>
+                <%=link_to '삭제', destroy_member_path(place.id) %>
+            <% end%>
+        <%end%>
+    </div>
+<%end%>
+</div>
+
+<!--<%=link_to 'find', find_temp_path,method: :post,:remote => true%>-->
+<div id="map" style="width:100%;height:350px;"></div>
+
+<%=link_to 'result', result_path(params[:id])%>
+
+
+<a id="kakao-link-btn" href="javascript:;">
+    <img src="/assets/kakao.jpg"/>
+</a>
+
+<script type='text/javascript'>
+    
+    Kakao.init('87e95e90db1318f284d859ffa50fed2d');
+   
+    
+    Kakao.Link.createDefaultButton({
+      container: '#kakao-link-btn',
+      objectType: 'feed',
+      content: {
+        title: '딸기 치즈 케익',
+        description: '#케익 #딸기 #삼평동 #카페 #분위기 #소개팅',
+        imageUrl: 'http://mud-kage.kakao.co.kr/dn/Q2iNx/btqgeRgV54P/VLdBs9cvyn8BJXB3o7N8UK/kakaolink40_original.png',
+        link: {
+          mobileWebUrl: 'https://where-to-meet-2-dboong.c9users.io/room/show/<%=params[:id]%>',
+          webUrl: 'https://where-to-meet-2-dboong.c9users.io/room/show/<%=params[:id]%>'
+        }
+      },
+      social: {
+        likeCount: 286,
+        commentCount: 45,
+        sharedCount: 845
+      },
+      buttons: [
+        {
+          title: '웹으로 보기',
+          link: {
+            mobileWebUrl: 'https://where-to-meet-2-dboong.c9users.io/room/show/<%=params[:id]%>',
+            webUrl: 'https://where-to-meet-2-dboong.c9users.io/room/show/<%=params[:id]%>'
+           
+          }
+        }
+      ]
+    });
+</script>
+
+<p id="bar">https://where-to-meet-2-dboong.c9users.io/room/show/<%=params[:id]%></p>
+
+<!-- Trigger -->
+<button class="clipboard-btn" data-clipboard-action="copy" data-clipboard-target="#bar">
+    Copy to clipboard
+</button>
+
 <script>
-$(document).ready(function(){
+    (function(){
+    new Clipboard('.clipboard-btn');
+})();
+</script>
+<script>
+
+
+// $(document).ready(function(){
        
     var positions = [];
     var center = [];
@@ -17,6 +95,13 @@ $(document).ready(function(){
         
     }
     
+    <%@room.places.each do |place| %>
+        positions.push(form_latlnghash('new', <%=place.lat%>,<%=place.lng%>));
+    <%end%>
+    
+    center.push(<%=@sum_lat%>);
+    center.push(<%=@sum_lng%>);
+    
     function update_latlng(index){
          
         var lat = $(this).find(".lat").val();
@@ -27,36 +112,35 @@ $(document).ready(function(){
     
     function getLocation() {
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(showPosition);
             
+         console.log(1);
+          navigator.geolocation.getCurrentPosition(showPosition);
+            
+        }else{
+            console.log('fails');
         }
     }
     
     function updateCenter(){
-        var SLat =0;
-        var SLng=0;
-        var pLen = positions.length;
-        for(var i=0;i<pLen;i++){
-            SLat+=positions[i].lat;
-            SLng+=positions[i].lng;
-        }
-        center=[SLat/pLen,SLng/pLen];
+        center[0] = <%=@sum_lat%>;
+        center[1] = <%=@sum_lng%>;
     }
     
-    function showPosition(position) {
+    function showPosition(position){
         
-        <%@room.places.each do |place|%>
-            var hash = form_latlnghash("new",<%=place.lat%>,<%=place.lng%>);
-            center.push(<%=place.lat%>);
-            center.push(<%=place.lng%>);
-            positions.push(hash);
-        <%end%>
-        updateCenter();
-        daum_map();
+    
+    console.log(position);
+     $.ajax({
+          url: "/room/refresh",
+          type: "POST",
+          data: {id: <%=params[:id]%>, lat: position.coords.latitude, lon: position.coords.longitude},
+          
+      });
+        
     }
     
-     $(".text").on('click',getLocation());
-     
+     $("#GPS").click(
+         getLocation         );
      
      
     function daum_map(){
@@ -90,10 +174,21 @@ $(document).ready(function(){
                 title : positions[i].title, // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
              // image : markerImage // 마커 이미지 
             });
-            
+            var polyline = new daum.maps.Polyline({
+                map: map,
+                path: [
+                    new daum.maps.LatLng(positions[i].lat,positions[i].lng),
+                    new daum.maps.LatLng(center[0],center[1])
+                    
+                ],
+                strokeWeight: 2,
+                strokeColor: '#FF00FF',
+                strokeOpacity: 0.8,
+                // strokeStyle: 'dashed'
+            });
             bounds.extend(placePosition);
         }
-        console.log(bounds);
+        //console.log(bounds);
 map.setBounds(bounds);    
   marker = new daum.maps.Marker({
         map: map, // 마커를 표시할 지도
@@ -102,28 +197,12 @@ map.setBounds(bounds);
         title : "center", // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
      //   image : markerImage // 마커 이미지 
     });
-   
-}
-});
     
+  
+}
+// });
     console.log(1);
+ daum_map();
+   
+    console.log(2);  
 </script>
-<div class="users">
-<%@room.places.each do |place|%>
-    <div class="user<%=place.user_id%>">
-        <%=form_for place,url: find_temp_path(params[:id]),method: :post,:remote => true do |f|%>
-            <%=f.hidden_field :user_id, placeholder: place.user_id %>
-            <%=f.number_field :lat, class: "lat", placeholder: place.lat, step: "0.0000001"%>
-            <%=f.number_field :lng, class: "lng", placeholder: place.lng, step: "0.0000001"%>
-            <%if place.user_id ==current_user.id%>
-                <%=f.submit%>
-            <%end%>
-        <%end%>
-    </div>
-<%end%>
-</div>
-
-<!--<%=link_to 'find', find_temp_path,method: :post,:remote => true%>-->
-<div id="map" style="width:100%;height:350px;"></div>
-
-<%=link_to 'result', result_path(params[:id])%>

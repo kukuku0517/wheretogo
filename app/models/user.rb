@@ -1,32 +1,80 @@
 class User < ActiveRecord::Base
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
-  devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :trackable, :validatable,
-         :omniauthable, :omniauth_providers => [:facebook]
-  
-  has_many :rooms
-         
-  def self.find_for_facebook_oauth(auth)
-   where(provider: auth.provider, uid: auth.uid).first_or_create do |user|
-      user.provider = auth.provider
-      user.uid = auth.uid
-      user.email = auth.info.email
-      user.password = Devise.friendly_token[0,20]
-      user.name = auth.info.name   # assuming the user model has a name
-      user.image = auth.info.image # assuming the user model has an image
-  end
-  
-    # # 이 때는 이상하게도 after_create 콜백이 호출되지 않아서 아래와 같은 조치를 했다.
-    # user.add_role :user if user.roles.empty?
-    # user   # 최종 반환값은 user 객체이어야 한다.
-  end
+  # rolify
+  # include Authority::UserAbilities
+  # after_create :set_default_role, if: Proc.new { User.count > 1 }
 
-  def self.new_with_session(params, session)
-    super.tap do |user|
-      if data = session["devise.facebook_data"] && session["devise.facebook_data"]["extra"]["raw_info"]
-        user.email = data["email"] if user.email.blank?
+devise :database_authenticatable, :registerable,
+         :confirmable, :recoverable, :rememberable, :trackable, :validatable,
+         :omniauthable 
+  has_many :identitys
+  
+
+TEMP_EMAIL_PREFIX = 'change@me'  
+  def self.find_for_oauth(auth, signed_in_resource = nil)
+
+ puts "fb0000000000000000000000000011111111111"
+    # user와 identity가 nil이 아니라면 받는다
+
+    identity = Identity.find_for_oauth(auth)
+    user = signed_in_resource ? signed_in_resource : identity.user
+
+    # user가 nil이라면 새로 만든다.
+
+    if user.nil?
+
+      # 이미 있는 이메일인지 확인한다.
+  email_is_verified = auth.info.email && (auth.info.verified || auth.info.verified_email)
+          email = auth.info.email if email_is_verified
+      user = User.where(:email => email).first
+ puts "fb0000000000000000000000000011111111111"
+      unless self.where(email: auth.info.email).exists?
+        # 없다면 새로운 데이터를 생성한다.
+
+        if user.nil?
+          # 카카오는 email을 제공하지 않음
+
+          if auth.provider == "kakao"
+           
+            # provider(회사)별로 데이터를 제공해주는 hash의 이름이 다릅니다.
+
+            # 각각의 omnaiuth별로 auth hash가 어떤 경로로, 어떤 이름으로 제공되는지 확인하고 설정해주세요.
+        
+            user = User.new(
+              profile_img: auth.info.image,
+              email: email ? email : "#{TEMP_EMAIL_PREFIX}-#{auth.uid}-#{auth.provider}.com",
+              # remote_profile_img_url: auth.info.image.gsub('http://','https://'),
+
+              password: Devise.friendly_token[0,20]
+            )
+
+          else
+            user = User.new(
+              email: auth.info.email,
+              profile_img: auth.info.image,
+              # remote_profile_img_url: auth.info.image.gsub('http://','https://'),
+
+              password: Devise.friendly_token[0,20]
+            )
+          end
+          user.skip_confirmation!
+          user.save!
+        end
       end
     end
+
+    if identity.user != user
+      identity.user = user
+      identity.save!
+    end
+   user
+
+  end
+
+  # email이 없어도 가입이 되도록 설정
+
+  def email_required?
+    false
   end
 end
