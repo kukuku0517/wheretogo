@@ -1,9 +1,14 @@
-<!--<%= stylesheet_link_tag 'signupin', media: 'all', 'data-turbolinks-track' => true %>-->
-<div class="ui middle aligned center aligned grid loginForm">
-  <div class="column loginColumn">
-    <h2 class="ui orange image header loginImage">
-      로그인
-    </h2>
+
+
+<div class="container">
+   <h2>로그인</h2>
+    
+    <%= render "devise/shared/links" %>
+  
+</div>
+
+
+
 <!--<%= form_for(resource, as: resource_name, url: session_path(resource_name), :html => {class: "ui large form"}) do |f| %>-->
 <!--<div class="ui raised segment loginBox">-->
 <!--  <div class="ui field">-->
@@ -27,7 +32,3 @@
 <!--    <%= f.submit "Log in", :class => 'ui fluid small yellow submit button' %>-->
 <!--  </div>-->
 <!--<% end %>-->
-  </div>
-    <%= render "devise/shared/links" %>
-  </div>
-</div>

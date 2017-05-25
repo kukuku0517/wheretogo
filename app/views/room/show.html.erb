@@ -1,34 +1,53 @@
-<h1>Post#show</h1>
-<p>Find me in app/views/post/show.html.erb</p>
+<div class="container">
+    <%@room.places.each do |place|%>
+        <div class="user<%=place.user_id%>">
+            
+            <%=form_for place,url: find_path(params[:id]),method: :get do |f|%>
+                <div class="row">
+                    <%=f.hidden_field :user_id,class: "form-control", placeholder: place.user_id %>
+                <div class="col-4"><%=User.find(place.user_id).email%> </div>
+                <div class="col-2">
+                    <%=f.number_field :lat, class: "lat", class: "form-control",placeholder: place.lat, step: "0.0000001"%>
+                </div>
+                <div class="col-2">
+                    <%=f.number_field :lng, class: "lng", class: "form-control",placeholder: place.lng, step: "0.0000001"%>
+                </div>
+                
+                <%if place.user_id ==current_user.id%>
+                    <div class="col-2">
+                        <%=f.submit '장소 정하기', class: "btn btn-info"%>
+                    </div>
+                <%end%>
+                
+                <% if @creator && place.user_id!=current_user.id %>
+                    <div class="col-2">
+                        <%=link_to '삭제', destroy_member_path(place.id), class: "btn btn-danger" %>
+                    </div>
+                <% end%>
+                </div>
+                        <%end%>
 
-<div class="users">
-<%@room.places.each do |place|%>
-    <div class="user<%=place.user_id%>">
-        <%=form_for place,url: find_path(params[:id]),method: :get do |f|%>
-            <%=f.hidden_field :user_id, placeholder: place.user_id %>
-            <%=place.user_id%> :
-            <%=f.number_field :lat, class: "lat", placeholder: place.lat, step: "0.0000001"%>
-            <%=f.number_field :lng, class: "lng", placeholder: place.lng, step: "0.0000001"%>
-            <%if place.user_id ==current_user.id%>
-                <%=f.submit%>
-            <%end%>
-            <% if @creator && place.user_id!=current_user.id %>
-                <%=link_to '삭제', destroy_member_path(place.id) %>
-            <% end%>
-        <%end%>
-    </div>
-<%end%>
-</div>
+        </div>
+    <%end%>    
 
-<!--<%=link_to 'find', find_temp_path,method: :post,:remote => true%>-->
+
+<h5 class="d-flex justify-content-center align-middle">링크 주소 : <kbd>https://where-to-meet-2-dboong.c9users.io/room/show/<%=params[:id]%></kbd>
+<%=image_tag 'http://www.iconsdb.com/icons/preview/black/copy-link-xxl.png',size: "50",class: "clipboard-btn",:data =>{:clipboard_action => "copy",:clipboard_target => "#bar"} %>
+</h5>
+
+
+<a class="d-flex justify-content-center" id="kakao-link-btn" href="javascript:;">
+    <%= image_tag 'kakao_link' %>
+</a>
 <div id="map" style="width:100%;height:350px;"></div>
 
-<%=link_to 'result', result_path(params[:id])%>
+<span class="d-flex justify-content-center"><%=link_to 'result', result_path(params[:id]),class: "btn btn-info btn-lg btn-block"%></span>
+
+</div>
 
 
-<a id="kakao-link-btn" href="javascript:;">
-    <img src="/assets/kakao.jpg"/>
-</a>
+
+
 
 <script type='text/javascript'>
     
@@ -65,17 +84,17 @@
     });
 </script>
 
-<p id="bar">https://where-to-meet-2-dboong.c9users.io/room/show/<%=params[:id]%></p>
-
-<!-- Trigger -->
-<button class="clipboard-btn" data-clipboard-action="copy" data-clipboard-target="#bar">
-    Copy to clipboard
-</button>
-
 <script>
-    (function(){
-    new Clipboard('.clipboard-btn');
-})();
+   var clipboard = new Clipboard('.clipboard-btn');
+
+clipboard.on('success', function(e) {
+   alert('주소가 복사되었습니다.\n(https://where-to-meet-2-dboong.c9users.io/room/show/<%=params[:id]%>)\r\n친구들에게 공유하세요!');
+});
+
+clipboard.on('error', function(e) {
+    console.error('Action:', e.action);
+    console.error('Trigger:', e.trigger);
+});
 </script>
 <script>
 

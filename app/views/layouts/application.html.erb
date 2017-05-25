@@ -8,15 +8,35 @@
   
 <script src="//developers.kakao.com/sdk/js/kakao.min.js"></script>
   <script type="text/javascript" src="//apis.daum.net/maps/maps3.js?apikey=e78e73fb03c7df3623d3f3aeaece86a3&libraries=services"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
 </head>
-<body><% if user_signed_in? %>
-  <%= link_to('로그아웃', destroy_user_session_path, :method => :delete, :class => 'item borderless') %>
-<% else %>
-  <%= link_to('로그인', new_user_session_path, :class => 'item borderless') %>
-<% end %>
-  <%=link_to 'MAIN', root_path%>
 
+<nav class="navbar navbar-toggleable-md navbar-light bg-faded">
+  <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <a class="navbar-brand" href="/"><b>울어봐</b></a>
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav">
+     
+      <% if user_signed_in? %>
+      <%=image_tag current_user.profile_img, size: '50'%>
+       <%= link_to(destroy_user_session_path, :method => :delete, :class => 'nav-item nav-link') do %>
+       로그아웃<span class="sr-only">(current)</span>
+       <%end%>
+     
+         <% end %>
+    </div>
+  </div>
+</nav>
+
+
+<body>
+
+  
 <%= yield %>
-
+<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
 </body>
 </html>

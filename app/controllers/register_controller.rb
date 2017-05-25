@@ -18,6 +18,6 @@ class RegisterController < ApplicationController
       @user.nickname = params[:nickname]
     end
     @user.save
-    redirect_to visitor_main_path
+    redirect_to root_path
   end
 end

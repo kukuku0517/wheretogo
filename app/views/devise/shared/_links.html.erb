@@ -5,17 +5,17 @@
         <%- if provider.to_s == "google_oauth2" %>
           <% provider = "google plus" %>
         <% end %>
-        <button class="ui fluid large <%= provider %> icon button sns">
-          <i class="<%= provider %> icon" style="float: left"></i>
+       
+          
           <% if provider.to_s == "facebook" %>
-            <% sns = '페이스북' %>
+             <button class="btn btn-primary">페이스북
           <% elsif provider.to_s == "google plus" %>
-            <% sns = '구글' %>
+             <button class="btn btn-danger">구글
           <% else %>
-            <% sns = '카카오' %>
+             <button class="btn btn-warning">카카오톡(not working)
           <% end %>
-          <%= sns %> 계정으로 로그인
-        </button>
+          계정으로 로그인</button>
+       
       <% end -%>
     <% end -%>
   </div>
