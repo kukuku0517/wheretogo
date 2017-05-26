@@ -44,7 +44,7 @@
 <span class="d-flex justify-content-center"><%=link_to 'result', result_path(params[:id]),class: "btn btn-info btn-lg btn-block"%></span>
 
 </div>
-
+<button id="GPS">GPS</button>
 
 
 
@@ -103,7 +103,12 @@ clipboard.on('error', function(e) {
        
     var positions = [];
     var center = [];
-      
+    var images=[];
+    
+    <%@room.places.each do |place|%>
+        images.push("<%=User.find(place.user_id).profile_img%>");
+    
+    <%end%>
     function form_latlnghash(title,lat,lng){
         
         var LatLngHash = {};
@@ -115,8 +120,9 @@ clipboard.on('error', function(e) {
     }
     
     <%@room.places.each do |place| %>
-        positions.push(form_latlnghash('new', <%=place.lat%>,<%=place.lng%>));
+        positions.push(form_latlnghash("<%=User.find(place.user_id).email%>", <%=place.lat%>,<%=place.lng%>));
     <%end%>
+    
     
     center.push(<%=@sum_lat%>);
     center.push(<%=@sum_lng%>);
@@ -128,42 +134,14 @@ clipboard.on('error', function(e) {
         
         positions[index] = form_latlnghash("updated",lat,lng);
     }
-    
-    function getLocation() {
-        if (navigator.geolocation) {
-            
-         console.log(1);
-          navigator.geolocation.getCurrentPosition(showPosition);
-            
-        }else{
-            console.log('fails');
-        }
-    }
-    
     function updateCenter(){
         center[0] = <%=@sum_lat%>;
         center[1] = <%=@sum_lng%>;
     }
-    
-    function showPosition(position){
-        
-    
-    console.log(position);
-     $.ajax({
-          url: "/room/refresh",
-          type: "POST",
-          data: {id: <%=params[:id]%>, lat: position.coords.latitude, lon: position.coords.longitude},
-          
-      });
-        
-    }
-    
-     $("#GPS").click(
-         getLocation         );
      
      
     function daum_map(){
-        console.log(center);
+      
         var mapContainer = document.getElementById('map'), // 지도를 표시할 div  
         mapOption = { 
             center: new daum.maps.LatLng(center[0], center[1]), // 지도의 중심좌표
@@ -175,13 +153,13 @@ clipboard.on('error', function(e) {
         // 마커를 표시할 위치와 title 객체 배열입니다 
         
         // 마커 이미지의 이미지 주소입니다
-        var imageSrc ='http://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_number_blue.png'; 
-        var bounds = new daum.maps.LatLngBounds();
+       var bounds = new daum.maps.LatLngBounds();
         
         for (var i = 0; i < positions.length; i ++) {
-           
+        // var imageSrc ='http://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_number_blue.png'; 
+            var imageSrc=images[i];
             // 마커 이미지의 이미지 크기 입니다
-            var imageSize = new daum.maps.Size(24, 35); 
+            var imageSize = new daum.maps.Size(35, 35); 
             var placePosition =  new daum.maps.LatLng(parseFloat(positions[i].lat), parseFloat(positions[i].lng));
             // // 마커 이미지를 생성합니다    
             var markerImage = new daum.maps.MarkerImage(imageSrc, imageSize); 
@@ -191,7 +169,7 @@ clipboard.on('error', function(e) {
                 map: map, // 마커를 표시할 지도
                 position: placePosition, // 마커를 표시할 위치
                 title : positions[i].title, // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
-             // image : markerImage // 마커 이미지 
+            image : markerImage // 마커 이미지 
             });
             var polyline = new daum.maps.Polyline({
                 map: map,
@@ -207,7 +185,7 @@ clipboard.on('error', function(e) {
             });
             bounds.extend(placePosition);
         }
-        //console.log(bounds);
+       
 map.setBounds(bounds);    
   marker = new daum.maps.Marker({
         map: map, // 마커를 표시할 지도
@@ -220,8 +198,33 @@ map.setBounds(bounds);
   
 }
 // });
-    console.log(1);
+   
  daum_map();
    
-    console.log(2);  
+   
+</script>
+
+<script>
+         
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(refresh);
+            }
+        }
+        
+        function refresh(position){
+              $.ajax(
+                    {
+                     url:"/room/refresh",
+                     type: 'post',
+                      data:{id: <%=params[:id]%>,                      lat: position.coords.latitude,                  lon: position.coords.longitude},
+                      success :function(d){}
+                    });
+        }
+       
+        $("#GPS").click(getLocation);
+        
+   
+       
+    
 </script>

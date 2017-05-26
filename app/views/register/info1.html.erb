@@ -5,11 +5,17 @@
         완료
       </div>
     </h2>
-    <%= form_tag(register_infoget_path, :class => 'ui large form col s12') do %>
- 
+<!--    <%= form_tag(register_infoget_path, :class => 'ui large form col s12') do %>-->
+<!-- nickname<%=text_field_tag :nickname%>-->
 
-    <div class="ui form">
-      <%= submit_tag "제출", :class => 'ui fluid large yellow submit button' %>
-<% end %>
+<!--    <div class="ui form">-->
+<!--      <%= submit_tag "제출", :class => 'ui fluid large yellow submit button' %>-->
+<!--<% end %>-->
+
+<%= form_for current_user, url: register_infoget_path,method: :post,:class => 'ui large form col s12' do |f|%>
+<%=f.text_field :nickname%>
+<%=f.submit 'submit'%>
+
+<%end%>
   </div>
 </div>

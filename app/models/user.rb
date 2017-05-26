@@ -14,7 +14,6 @@ devise :database_authenticatable, :registerable,
 TEMP_EMAIL_PREFIX = 'change@me'  
   def self.find_for_oauth(auth, signed_in_resource = nil)
 
- puts "fb0000000000000000000000000011111111111"
     # user와 identity가 nil이 아니라면 받는다
 
     identity = Identity.find_for_oauth(auth)
@@ -28,7 +27,6 @@ TEMP_EMAIL_PREFIX = 'change@me'
   email_is_verified = auth.info.email && (auth.info.verified || auth.info.verified_email)
           email = auth.info.email if email_is_verified
       user = User.where(:email => email).first
- puts "fb0000000000000000000000000011111111111"
       unless self.where(email: auth.info.email).exists?
         # 없다면 새로운 데이터를 생성한다.
 
@@ -49,12 +47,18 @@ TEMP_EMAIL_PREFIX = 'change@me'
               password: Devise.friendly_token[0,20]
             )
 
-          else
+          elsif auth.provider == "facebook" || auth.provider =="google_oauth2"
             user = User.new(
               email: auth.info.email,
               profile_img: auth.info.image,
               # remote_profile_img_url: auth.info.image.gsub('http://','https://'),
 
+              password: Devise.friendly_token[0,20]
+            )
+          else
+             user = User.new(
+              email: auth.info.email,
+             
               password: Devise.friendly_token[0,20]
             )
           end
@@ -73,7 +77,10 @@ TEMP_EMAIL_PREFIX = 'change@me'
   end
 
   # email이 없어도 가입이 되도록 설정
-
+ def confirmation_required? 
+  false
+  end
+  
   def email_required?
     false
   end

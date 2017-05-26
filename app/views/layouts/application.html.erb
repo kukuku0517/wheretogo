@@ -20,7 +20,13 @@
     <div class="navbar-nav">
      
       <% if user_signed_in? %>
+      
+      <%=current_user.id%>
+      <%=current_user.nickname%>
       <%=image_tag current_user.profile_img, size: '50'%>
+       
+       <%= link_to 'edit',edit_user_registration_path, :method => :get, :class => 'nav-item nav-link'%>
+       
        <%= link_to(destroy_user_session_path, :method => :delete, :class => 'nav-item nav-link') do %>
        로그아웃<span class="sr-only">(current)</span>
        <%end%>
