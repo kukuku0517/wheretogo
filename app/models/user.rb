@@ -10,6 +10,8 @@ devise :database_authenticatable, :registerable,
          :omniauthable 
   has_many :identitys
   
+  has_and_belongs_to_many :likes
+  
 
 TEMP_EMAIL_PREFIX = 'change@me'  
   def self.find_for_oauth(auth, signed_in_resource = nil)
@@ -79,7 +81,7 @@ TEMP_EMAIL_PREFIX = 'change@me'
   # email이 없어도 가입이 되도록 설정
  def confirmation_required? 
   false
-  end
+end
   
   def email_required?
     false

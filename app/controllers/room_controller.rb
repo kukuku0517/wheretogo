@@ -45,7 +45,6 @@ class RoomController < ApplicationController
       myplace = Place.find_by(room_id: params[:id], user_id: current_user.id)
       myplace.lat = params[:place][:lat]
       myplace.lng = params[:place][:lng]
-      myplace.check = 1
       myplace.save
       
       redirect_to show_path(params[:id])
@@ -63,7 +62,6 @@ class RoomController < ApplicationController
     
     place.lat = params[:lat]
     place.lng = params[:lon]
-    place.check = 1
     place.save
     
     respond_to do |format|
@@ -104,6 +102,7 @@ class RoomController < ApplicationController
   end
   
   def result
+      @radius = params[:length].to_i/3
        @room = Room.find(params[:id])
        count = @room.places.length
        @sum_lat = 0
@@ -114,6 +113,17 @@ class RoomController < ApplicationController
        end
        @sum_lat/=count
        @sum_lng/=count
+       
+       @likes = @room.likes.where(user_id: current_user.id)
+        
+        @is_check = true
+        @room.places.each do |place|
+          if place.check != 1
+              @is_check = false
+              break
+          end
+        end
+        @like = @room.likes
   end
   
   def result2
@@ -129,6 +139,15 @@ class RoomController < ApplicationController
        @sum_lng/=count
        
        
+  end
+  
+  def like
+      room = Room.find(params[:id])
+      myplace = room.places.find_by(user_id: current_user.id)
+      myplace.check = 1
+      myplace.save
+      
+      redirect_to :back
   end
   
 end

@@ -14,7 +14,6 @@ class ApplicationController < ActionController::Base
     
     devise_parameter_sanitizer.permit(:sign_in) do |user_params|
       user_params.permit(:username, :name, :profile_img, :nickname)
-      
     end
   end
     

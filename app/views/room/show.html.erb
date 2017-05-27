@@ -5,7 +5,7 @@
             <%=form_for place,url: find_path(params[:id]),method: :get do |f|%>
                 <div class="row">
                     <%=f.hidden_field :user_id,class: "form-control", placeholder: place.user_id %>
-                <div class="col-4"><%=User.find(place.user_id).email%> </div>
+                <div class="col-4"><%=User.find(place.user_id).nickname%> </div>
                 <div class="col-2">
                     <%=f.number_field :lat, class: "lat", class: "form-control",placeholder: place.lat, step: "0.0000001"%>
                 </div>
@@ -31,7 +31,7 @@
     <%end%>    
 
 
-<h5 class="d-flex justify-content-center align-middle">링크 주소 : <kbd>https://where-to-meet-2-dboong.c9users.io/room/show/<%=params[:id]%></kbd>
+<h5 class="d-flex justify-content-center align-middle">링크 주소 : <kbd id="bar">https://where-to-meet-2-dboong.c9users.io/room/show/<%=params[:id]%></kbd>
 <%=image_tag 'http://www.iconsdb.com/icons/preview/black/copy-link-xxl.png',size: "50",class: "clipboard-btn",:data =>{:clipboard_action => "copy",:clipboard_target => "#bar"} %>
 </h5>
 
@@ -41,12 +41,29 @@
 </a>
 <div id="map" style="width:100%;height:350px;"></div>
 
-<span class="d-flex justify-content-center"><%=link_to 'result', result_path(params[:id]),class: "btn btn-info btn-lg btn-block"%></span>
+
+<%=form_tag(result_path(params[:id]),method: :post) do %>
+<%=hidden_field_tag :length %>
+<span class="d-flex justify-content-center"><%=submit_tag 'result', class: "btn btn-info btn-lg btn-block"%></span>
+<% end %>
 
 </div>
 <button id="GPS">GPS</button>
 
 
+<!--url 복사-->
+<script>
+   var clipboard = new Clipboard('.clipboard-btn');
+
+clipboard.on('success', function(e) {
+   alert('주소가 복사되었습니다.\n(https://where-to-meet-2-dboong.c9users.io/room/show/<%=params[:id]%>)\r\n친구들에게 공유하세요!');
+});
+
+clipboard.on('error', function(e) {
+    console.error('Action:', e.action);
+    console.error('Trigger:', e.trigger);
+});
+</script>
 
 
 <script type='text/javascript'>
@@ -84,18 +101,6 @@
     });
 </script>
 
-<script>
-   var clipboard = new Clipboard('.clipboard-btn');
-
-clipboard.on('success', function(e) {
-   alert('주소가 복사되었습니다.\n(https://where-to-meet-2-dboong.c9users.io/room/show/<%=params[:id]%>)\r\n친구들에게 공유하세요!');
-});
-
-clipboard.on('error', function(e) {
-    console.error('Action:', e.action);
-    console.error('Trigger:', e.trigger);
-});
-</script>
 <script>
 
 
@@ -138,7 +143,8 @@ clipboard.on('error', function(e) {
         center[0] = <%=@sum_lat%>;
         center[1] = <%=@sum_lng%>;
     }
-     
+    
+    var polyLength = 0;
      
     function daum_map(){
       
@@ -184,7 +190,13 @@ clipboard.on('error', function(e) {
                 // strokeStyle: 'dashed'
             });
             bounds.extend(placePosition);
+            if(polyLength<polyline.getLength()){
+                polyLength = polyline.getLength();
+            }
         }
+        $('#length').val(polyLength);
+        console.log(polyLength);
+        
        
 map.setBounds(bounds);    
   marker = new daum.maps.Marker({

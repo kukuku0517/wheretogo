@@ -46,6 +46,14 @@
 <!--HP8 병원-->
 <!--PM9 약국-->
 
+<input type="text" id="radius"><input type="submit" id="control" value="반경 조절">
+<%=link_to '장소선택 완료', like_path(params[:id]) %>
+<% if !@is_check %>
+장소선택 대기중
+<% else %>
+<button id="result">결과 보기</button>
+<% end %>
+
 <div class="map_wrap">
      <div id="map" style="width:100%;height:100%;position:relative;overflow:hidden;"></div>
     
@@ -99,10 +107,16 @@
     </div>
 </div>
 
-<input type="text" id="radius"><input type="submit" id="control" value="반경 조절">
 
 <script>
 
+$('#result').click(function(){
+    var str = ""
+    <% @like.each do |like| %>
+      str += "<%=like.place%>" + "\n";
+    <% end %>
+    alert(str);
+  })
 // function daum_map_result(){
     
    var placeOverlay = new daum.maps.CustomOverlay({zIndex:1}), 
@@ -130,7 +144,7 @@
     
     var circle = new daum.maps.Circle({
       center: new daum.maps.LatLng(<%=@sum_lat%>, <%=@sum_lng%>),
-      radius: 1000, // 미터 단위의 원의 반지름입니다
+      radius: <%=@radius%>, // 미터 단위의 원의 반지름입니다
       strokeWeight: 5, // 선의 두께입니다
       strokeColor: '#75B8FA', // 선의 색깔입니다
       strokeOpacity: 1, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
@@ -305,6 +319,11 @@ var keyOrCat;
         // 검색결과 항목들을 검색결과 목록 Elemnet에 추가합니다
         listEl.appendChild(fragment);
         menuEl.scrollTop = 0;
+        
+        $(".like").click(function(){
+          location.href="/likes/create/"+<%=params[:id]%>+"/"+this.id;
+          //console.log(currCategory+"-"+this.id);
+        });
     
         // 검색된 장소 위치를 기준으로 지도 범위를 재설정합니다
       //  map.setBounds(bounds);
@@ -344,9 +363,21 @@ function displayPlaceInfo (place) {
         } else {
             itemStr += '    <span>' +  places.address  + '</span>'; 
         }
-                     
-          itemStr += '  <span class="tel">' + places.phone  + '</span>' +
-                    '</div>'; 
+          itemStr += '  <span class="tel">' + places.phone  + '</span>';
+          
+          var is_like = false;
+          <% @likes.each do |l| %>
+          if("<%=l.place%>"==places.title){
+            is_like = true;
+          }
+          <% end %>
+          if(is_like){
+            itemStr += '<button class="like" id="'+places.title+'">좋아요취소</button>';
+          }else{
+            itemStr += '<button class="like" id="'+places.title+'">좋아요</button>';
+          }
+          
+          itemStr +='</div>';  
                     
           itemStr+= '<a href="daummaps://route?sp=['+places.latitude+','+places.longitude+']&ep=['+<%=@sum_lat%>+','+<%=@sum_lng%>+']&by=[CAR|PUBLICTRASIT|FOOT]">go</a>';
     
