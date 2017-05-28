@@ -17,6 +17,7 @@ Rails.application.routes.draw do
   get 'room/show/:id'=> 'room#show',as: :show
   get 'room/find/:id'=> 'room#find',as: :find
   get 'room/destroy_member/:id' => 'room#destroy_member',as: :destroy_member
+  get 'room/destroy_self/:id' => 'room#destroy_self',as: :destroy_self
   post 'room/save/:id' => 'room#save',as: :save
   
   get 'room/result/:id'=> 'room#result'
@@ -26,8 +27,11 @@ Rails.application.routes.draw do
   post 'room/find_temp/:id'=> 'room#find_temp',as: :find_temp
   post 'room/refresh' => 'room#refresh',as: :refresh
   
-  get 'likes/create/:id/:name' => 'likes#create'
+   get 'room/prac' => 'room#prac'
+   
+  get 'room/like_create' => 'room#like_create',as: :like_create
   get 'room/like/:id' => 'room#like',as: :like
+  get 'room/like_result/:id' => 'room#like_result',as: :like_result
 
   devise_for :users, :controllers => { :omniauth_callbacks => "users/omniauth_callbacks" }
   

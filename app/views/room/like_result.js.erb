@@ -1,0 +1,5 @@
+<% @likes = Room.find(params[:id]).likes %>
+
+<%@likes.each do |like|%>
+$('.modal-body').append('<li><%=like.place%></li>');
+<%end%>

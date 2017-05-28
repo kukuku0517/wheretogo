@@ -1,22 +1,30 @@
+
+<!--참가자 각각 lat,lng,placename / 장소정하기, 방나가기 / 강퇴 -->
 <div class="container">
     <%@room.places.each do |place|%>
         <div class="user<%=place.user_id%>">
-            
             <%=form_for place,url: find_path(params[:id]),method: :get do |f|%>
                 <div class="row">
                     <%=f.hidden_field :user_id,class: "form-control", placeholder: place.user_id %>
-                <div class="col-4"><%=User.find(place.user_id).nickname%> </div>
-                <div class="col-2">
+                <div class="col-2"><%=User.find(place.user_id).nickname%> </div>
+                <div class="col-1">
                     <%=f.number_field :lat, class: "lat", class: "form-control",placeholder: place.lat, step: "0.0000001"%>
                 </div>
-                <div class="col-2">
+                <div class="col-1">
                     <%=f.number_field :lng, class: "lng", class: "form-control",placeholder: place.lng, step: "0.0000001"%>
+                </div>
+                <div class="col-4">
+                    <%=f.text_field :placename%>
                 </div>
                 
                 <%if place.user_id ==current_user.id%>
                     <div class="col-2">
                         <%=f.submit '장소 정하기', class: "btn btn-info"%>
                     </div>
+                    <div class="col-2">
+                        <%=link_to '방 나가기', destroy_self_path(place.id), class: "btn btn-info"%>
+                    </div>
+                    
                 <%end%>
                 
                 <% if @creator && place.user_id!=current_user.id %>
@@ -25,52 +33,50 @@
                     </div>
                 <% end%>
                 </div>
-                        <%end%>
-
+            <%end%>
         </div>
     <%end%>    
 
+    <!--링크주소복사-->
+    <h5 class="d-flex justify-content-center align-middle">링크 주소 : <kbd id="bar">https://where-to-meet-2-dboong.c9users.io/room/show/<%=params[:id]%></kbd>
+    <%=image_tag 'http://www.iconsdb.com/icons/preview/black/copy-link-xxl.png',size: "50",class: "clipboard-btn",:data =>{:clipboard_action => "copy",:clipboard_target => "#bar"} %>
+    </h5>
 
-<h5 class="d-flex justify-content-center align-middle">링크 주소 : <kbd id="bar">https://where-to-meet-2-dboong.c9users.io/room/show/<%=params[:id]%></kbd>
-<%=image_tag 'http://www.iconsdb.com/icons/preview/black/copy-link-xxl.png',size: "50",class: "clipboard-btn",:data =>{:clipboard_action => "copy",:clipboard_target => "#bar"} %>
-</h5>
-
-
-<a class="d-flex justify-content-center" id="kakao-link-btn" href="javascript:;">
-    <%= image_tag 'kakao_link' %>
-</a>
-<div id="map" style="width:100%;height:350px;"></div>
-
-
-<%=form_tag(result_path(params[:id]),method: :post) do %>
-<%=hidden_field_tag :length %>
-<span class="d-flex justify-content-center"><%=submit_tag 'result', class: "btn btn-info btn-lg btn-block"%></span>
-<% end %>
+    <!--카카오톡 링크 생성-->
+    <a class="d-flex justify-content-center" id="kakao-link-btn" href="javascript:;">
+        <%= image_tag 'kakao_link' %>
+    </a>
+    <!--지도-->
+    <div id="map" style="width:100%;height:350px;"></div>
+    
+    <!--결과보기-->
+    <%=form_tag(result_path(params[:id]),method: :post) do %>
+       
+        <span class="d-flex justify-content-center"><%=submit_tag 'result', class: "btn btn-info btn-lg btn-block"%></span>
+    <% end %>
 
 </div>
+
+<!--현재 gps로 업데이트-->
 <button id="GPS">GPS</button>
-
-
-<!--url 복사-->
-<script>
-   var clipboard = new Clipboard('.clipboard-btn');
-
-clipboard.on('success', function(e) {
-   alert('주소가 복사되었습니다.\n(https://where-to-meet-2-dboong.c9users.io/room/show/<%=params[:id]%>)\r\n친구들에게 공유하세요!');
-});
-
-clipboard.on('error', function(e) {
-    console.error('Action:', e.action);
-    console.error('Trigger:', e.trigger);
-});
-</script>
 
 
 <script type='text/javascript'>
     
-    Kakao.init('87e95e90db1318f284d859ffa50fed2d');
-   
+    // 주소복사
+    var clipboard = new Clipboard('.clipboard-btn');
     
+    clipboard.on('success', function(e) {
+       alert('주소가 복사되었습니다.\n(https://where-to-meet-2-dboong.c9users.io/room/show/<%=params[:id]%>)\r\n친구들에게 공유하세요!');
+    });
+    clipboard.on('error', function(e) {
+        console.error('Action:', e.action);
+        console.error('Trigger:', e.trigger);
+    });
+
+    // 카카오톡 링크
+    Kakao.init('87e95e90db1318f284d859ffa50fed2d');
+
     Kakao.Link.createDefaultButton({
       container: '#kakao-link-btn',
       objectType: 'feed',
@@ -103,49 +109,45 @@ clipboard.on('error', function(e) {
 
 <script>
 
-
-// $(document).ready(function(){
-       
-    var positions = [];
-    var center = [];
-    var images=[];
+$(document).ready(function(){
+   
+    var positions = []; //lat,lng의 배열
+    var center = []; //중간 좌표
+    var images=[]; //user 프로필
+    // var polyLength = 0;
     
-    <%@room.places.each do |place|%>
-        images.push("<%=User.find(place.user_id).profile_img%>");
-    
-    <%end%>
+    //lat,lng hash 생성
     function form_latlnghash(title,lat,lng){
-        
         var LatLngHash = {};
         LatLngHash["title"] = title;
         LatLngHash["lat"] = lat;
         LatLngHash["lng"] = lng;
         return LatLngHash;
-        
     }
-    
-    <%@room.places.each do |place| %>
-        positions.push(form_latlnghash("<%=User.find(place.user_id).email%>", <%=place.lat%>,<%=place.lng%>));
-    <%end%>
-    
-    
-    center.push(<%=@sum_lat%>);
-    center.push(<%=@sum_lng%>);
     
     function update_latlng(index){
-         
         var lat = $(this).find(".lat").val();
         var lng = $(this).find(".lon").val();
-        
         positions[index] = form_latlnghash("updated",lat,lng);
     }
+    
     function updateCenter(){
         center[0] = <%=@sum_lat%>;
         center[1] = <%=@sum_lng%>;
     }
     
-    var polyLength = 0;
-     
+    //position, center, images 초기화
+    <%@room.places.each do |place| %>
+        positions.push(form_latlnghash("<%=User.find(place.user_id).nickname%>", <%=place.lat%>,<%=place.lng%>));
+        
+    <%end%>
+    console.log(positions[0]);
+    center.push(<%=@sum_lat%>);
+    center.push(<%=@sum_lng%>);
+    <%@room.places.each do |place|%>
+        images.push("<%=User.find(place.user_id).profile_img%>");
+    <%end%>
+    
     function daum_map(){
       
         var mapContainer = document.getElementById('map'), // 지도를 표시할 div  
@@ -156,13 +158,9 @@ clipboard.on('error', function(e) {
         
         var map = new daum.maps.Map(mapContainer, mapOption); // 지도를 생성합니다
          
-        // 마커를 표시할 위치와 title 객체 배열입니다 
-        
         // 마커 이미지의 이미지 주소입니다
-       var bounds = new daum.maps.LatLngBounds();
-        
+        var bounds = new daum.maps.LatLngBounds();
         for (var i = 0; i < positions.length; i ++) {
-        // var imageSrc ='http://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_number_blue.png'; 
             var imageSrc=images[i];
             // 마커 이미지의 이미지 크기 입니다
             var imageSize = new daum.maps.Size(35, 35); 
@@ -175,7 +173,7 @@ clipboard.on('error', function(e) {
                 map: map, // 마커를 표시할 지도
                 position: placePosition, // 마커를 표시할 위치
                 title : positions[i].title, // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
-            image : markerImage // 마커 이미지 
+                image : markerImage // 마커 이미지 
             });
             var polyline = new daum.maps.Polyline({
                 map: map,
@@ -190,53 +188,63 @@ clipboard.on('error', function(e) {
                 // strokeStyle: 'dashed'
             });
             bounds.extend(placePosition);
-            if(polyLength<polyline.getLength()){
-                polyLength = polyline.getLength();
-            }
+            // if(polyLength<polyline.getLength()){
+            //     polyLength = polyline.getLength();
+            // }
         }
-        $('#length').val(polyLength);
-        console.log(polyLength);
         
+        // $('#length').val(polyLength);
+            
        
-map.setBounds(bounds);    
-  marker = new daum.maps.Marker({
-        map: map, // 마커를 표시할 지도
-      
-        position: new daum.maps.LatLng(center[0],center[1]), // 마커를 표시할 위치
-        title : "center", // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
-     //   image : markerImage // 마커 이미지 
-    });
+        map.setBounds(bounds);    
+        marker = new daum.maps.Marker({
+            map: map, // 마커를 표시할 지도
+            position: new daum.maps.LatLng(center[0],center[1]), // 마커를 표시할 위치
+            title : "center", // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
+        });
+    }
     
-  
-}
-// });
-   
- daum_map();
-   
-   
+    // center기준 place위치 표시
+    daum_map(); 
+});
 </script>
 
 <script>
-         
-        function getLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(refresh);
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(refresh);
+        }
+    }
+        
+    function refresh(position){
+        console.log(position);
+        $.ajax({
+            url:"/room/refresh",
+            type: 'post',
+            data:{
+                 id: <%=params[:id]%>,
+                 lat: position.coords.latitude,
+                 lon: position.coords.longitude
+            },
+            success: function(d){
+               positions =[];
+              
+               center=[];
+                
+                <%@room.places.each do |place| %>
+                    positions.push(form_latlnghash("<%=User.find(place.user_id).nickname%>", <%=place.lat%>,<%=place.lng%>));
+                <%end%>
+                center.push(<%=@sum_lat%>);
+                center.push(<%=@sum_lng%>);
+                <%@room.places.each do |place|%>
+                    images.push("<%=User.find(place.user_id).profile_img%>");
+                <%end%>
+                
+                console.log(positions[0]);
+                daum_map();
             }
-        }
-        
-        function refresh(position){
-              $.ajax(
-                    {
-                     url:"/room/refresh",
-                     type: 'post',
-                      data:{id: <%=params[:id]%>,                      lat: position.coords.latitude,                  lon: position.coords.longitude},
-                      success :function(d){}
-                    });
-        }
+        });
+    }
        
-        $("#GPS").click(getLocation);
-        
-   
-       
-    
+    $("#GPS").click(getLocation);
 </script>

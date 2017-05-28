@@ -5,6 +5,7 @@ class CreatePlaces < ActiveRecord::Migration
       t.integer :user_id
       t.float :lat
       t.float :lng
+      t.string :placename
       t.integer :check
       t.timestamps null: false
     end

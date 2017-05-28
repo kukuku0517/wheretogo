@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170527085835) do
+ActiveRecord::Schema.define(version: 20170528103631) do
 
   create_table "identities", force: :cascade do |t|
     t.integer  "user_id"
@@ -31,11 +31,20 @@ ActiveRecord::Schema.define(version: 20170527085835) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "likes_users", id: false, force: :cascade do |t|
+    t.integer "like_id"
+    t.integer "user_id"
+  end
+
+  add_index "likes_users", ["like_id"], name: "index_likes_users_on_like_id"
+  add_index "likes_users", ["user_id"], name: "index_likes_users_on_user_id"
+
   create_table "places", force: :cascade do |t|
     t.integer  "room_id"
     t.integer  "user_id"
     t.float    "lat"
     t.float    "lng"
+    t.string   "placename"
     t.integer  "check"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
