@@ -121,6 +121,7 @@
   </div>
 </div>
 
+
 <script>
 $(document).ready(function(){
   
@@ -312,18 +313,23 @@ $(document).ready(function(){
       
       $(".like").each(function(){
         var like_btn =$(this);
+        var like_lat = like_btn.find("input[name='lat']").val();
+        var like_lng =  like_btn.find("input[name='lng']").val();
+        var like_title =  like_btn.find("input[name='title']").val();
+        var like_placeUrl =  like_btn.find("input[name='placeUrl']").val();
+          
         like_btn.click(function(){
           
         $.ajax({
           url: "/room/like_create",
           type: 'get',
-          data:{id: <%=params[:id]%>, name: this.id},
+          data:{id: <%=params[:id]%>, lat: like_lat, lng:like_lng,title:like_title,placeUrl:like_placeUrl},
           success: function(){
           
-            if (like_btn[0].innerHTML=='좋아요')
-              like_btn[0].innerHTML='좋아요 취소';
+            if (like_btn[0].innerText=='좋아요')
+              like_btn[0].innerText='좋아요 취소';
             else
-              like_btn[0].innerHTML='좋아요';
+              like_btn[0].innerText='좋아요';
             }
         });
         });
@@ -372,11 +378,22 @@ $(document).ready(function(){
         }
         <% end %>
         if(is_like){
-          itemStr += '<button class="like" id="'+places.title+'">좋아요취소</button>';
-         
+          itemStr += '<button class="like">좋아요취소';
+          itemStr += '<input type="hidden" name="lat" value="'+places.latitude+'">'
+          itemStr += '<input type="hidden" name="lng" value="'+places.longitude+'">'
+          itemStr += '<input type="hidden" name="title" value="'+places.title+'">'
+          itemStr += '<input type="hidden" name="placeUrl" value="'+places.placeUrl+'">';
+          
+          itemStr += '</button>'
         }else{
-          itemStr += '<button class="like" id="'+places.title+'">좋아요</button>';
-        }
+          itemStr += '<button class="like">좋아요';
+          itemStr += '<input type="hidden" name="lat" value="'+places.latitude+'">'
+          itemStr += '<input type="hidden" name="lng" value="'+places.longitude+'">'
+          itemStr += '<input type="hidden" name="title" value="'+places.title+'">'
+          itemStr += '<input type="hidden" name="placeUrl" value="'+places.placeUrl+'">';
+          
+          itemStr += '</button>'
+         }
         
         itemStr +='</div>';  
                   

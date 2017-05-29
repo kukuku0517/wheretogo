@@ -69,7 +69,7 @@ class RoomController < ApplicationController
     
     place.lat = params[:lat]
     place.lng = params[:lon]
-   place.save
+  # place.save
     
     # count = @room.places.length
     # @sum_lat = 0
@@ -81,15 +81,15 @@ class RoomController < ApplicationController
     # @sum_lat/=count
     # @sum_lng/=count
     
-    # respond_to do |format|
-    #     if place.save
-    #       format.js
-    #       # format.js 
-    #     else
-    #     #   format.html { render 'new'} ## Specify the format in which you are rendering "new" page
-    #     #   format.json { render json: @reservation.errors } ## You might want to specify a json format as well
-    #     end
-    # end
+    respond_to do |format|
+        if place.save
+          format.js
+          # format.js 
+        else
+        #   format.html { render 'new'} ## Specify the format in which you are rendering "new" page
+        #   format.json { render json: @reservation.errors } ## You might want to specify a json format as well
+        end
+    end
   end
   
   ####################### 장소 정하기 (find + save) ##########################
@@ -112,13 +112,17 @@ class RoomController < ApplicationController
     
     
     @room = Room.find(params[:id])
-    mlat = @room.places.map(&:lat).minmax
-    mlng = @room.places.map(&:lng).minmax
     count = @room.places.length
-   
-    loc1 = [mlat[0],mlng[0]]
-    loc2 = [mlat[1],mlng[1]]
-    @radius = distance(loc1,loc2)/3
+    if count == 1
+      @radius = 500
+    else
+      mlat = @room.places.map(&:lat).minmax
+      mlng = @room.places.map(&:lng).minmax
+     
+      loc1 = [mlat[0],mlng[0]]
+      loc2 = [mlat[1],mlng[1]]
+      @radius = distance(loc1,loc2)/3
+    end
     
     @sum_lat = 0
     @sum_lng = 0
@@ -150,13 +154,11 @@ class RoomController < ApplicationController
       
       redirect_to :back
   end
-  def prac
-  end
   
    def like_create
-        like = Like.find_by(user_id: current_user.id, place: params[:name], room_id: params[:id])
+        like = Like.find_by(user_id: current_user.id, place: params[:title], room_id: params[:id])
         if like.nil?
-            Like.create(user_id: current_user.id, place: params[:name], room_id: params[:id])
+            Like.create(user_id: current_user.id, place: params[:title], room_id: params[:id],lat: params[:lat],lng: params[:lng],placeUrl: params[:placeUrl])
             
         else
             like.destroy

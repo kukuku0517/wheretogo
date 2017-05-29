@@ -25,6 +25,7 @@
                         <%=link_to '방 나가기', destroy_self_path(place.id), class: "btn btn-info"%>
                     </div>
                     
+                   
                 <%end%>
                 
                 <% if @creator && place.user_id!=current_user.id %>
@@ -36,7 +37,11 @@
             <%end%>
         </div>
     <%end%>    
-
+ <div class="col-1">
+<!--현재 gps로 업데이트-->
+<button id="GPS" href="javascript(0);">GPS</button>
+                    
+                    </div>
     <!--링크주소복사-->
     <h5 class="d-flex justify-content-center align-middle">링크 주소 : <kbd id="bar">https://where-to-meet-2-dboong.c9users.io/room/show/<%=params[:id]%></kbd>
     <%=image_tag 'http://www.iconsdb.com/icons/preview/black/copy-link-xxl.png',size: "50",class: "clipboard-btn",:data =>{:clipboard_action => "copy",:clipboard_target => "#bar"} %>
@@ -57,8 +62,6 @@
 
 </div>
 
-<!--현재 gps로 업데이트-->
-<button id="GPS">GPS</button>
 
 
 <script type='text/javascript'>
@@ -217,7 +220,6 @@ $(document).ready(function(){
     }
         
     function refresh(position){
-        console.log(position);
         $.ajax({
             url:"/room/refresh",
             type: 'post',
@@ -227,24 +229,47 @@ $(document).ready(function(){
                  lon: position.coords.longitude
             },
             success: function(d){
-               positions =[];
               
-               center=[];
-                
-                <%@room.places.each do |place| %>
-                    positions.push(form_latlnghash("<%=User.find(place.user_id).nickname%>", <%=place.lat%>,<%=place.lng%>));
-                <%end%>
-                center.push(<%=@sum_lat%>);
-                center.push(<%=@sum_lng%>);
-                <%@room.places.each do |place|%>
-                    images.push("<%=User.find(place.user_id).profile_img%>");
-                <%end%>
-                
-                console.log(positions[0]);
-                daum_map();
             }
         });
     }
        
     $("#GPS").click(getLocation);
+</script>
+
+<script>
+    
+    
+var map_click = function(mouseEvent) {  
+    var content;
+ searchDetailAddrFromCoords(mouseEvent.latLng, function(status, result){
+     
+          if (status === daum.maps.services.Status.OK) {
+            var detailAddr = !!result[0].roadAddress.name ? '<div>도로명주소 : ' + result[0].roadAddress.name + '</div>' : '';
+            detailAddr += '<div>지번 주소 : ' + result[0].jibunAddress.name + '</div>';
+            
+           content = '<div class="bAddr">' +
+                            '<span class="title">법정동 주소정보</span>' + 
+                            detailAddr + 
+                        '</div>';
+                        console.log(content);
+
+var latlng = mouseEvent.latLng; 
+    usermarker.setPosition(latlng);
+    usermarker.setMap(map);
+    
+      // 인포윈도우에 클릭한 위치에 대한 법정동 상세 주소정보를 표시합니다
+            infowindow.setContent(content);
+            infowindow.open(map, usermarker);
+            
+    user_lat.val(latlng.getLat());
+    user_lng.val(latlng.getLng());
+    user_placename.val(result[0].jibunAddress.name);
+    
+          
+        }   
+        
+ } );
+    
+}
 </script>

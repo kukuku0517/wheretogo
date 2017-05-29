@@ -4,6 +4,10 @@ class CreateLikes < ActiveRecord::Migration
       t.integer :room_id
       t.integer :user_id
       t.string :place
+      t.float :lat
+      t.float :lng
+      t.float :placeUrl
+      
 
       t.timestamps null: false
     end

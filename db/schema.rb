@@ -27,6 +27,9 @@ ActiveRecord::Schema.define(version: 20170528103631) do
     t.integer  "room_id"
     t.integer  "user_id"
     t.string   "place"
+    t.float    "lat"
+    t.float    "lng"
+    t.float    "placeUrl"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

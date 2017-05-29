@@ -1,0 +1,98 @@
+
+var positions = []; //lat,lng의 배열
+var center = []; //중간 좌표
+var images=[]; 
+
+function form_latlnghash(title,lat,lng){
+    var LatLngHash = {};
+    LatLngHash["title"] = title;
+    LatLngHash["lat"] = lat;
+    LatLngHash["lng"] = lng;
+    return LatLngHash;
+}
+
+function update_latlng(index){
+    var lat = $(this).find(".lat").val();
+    var lng = $(this).find(".lon").val();
+    positions[index] = form_latlnghash("updated",lat,lng);
+}
+
+  
+<%@room.places.each do |place| %>
+    positions.push(form_latlnghash("<%=User.find(place.user_id).nickname%>", <%=place.lat%>,<%=place.lng%>));
+<%end%>
+
+<%count = @room.places.length%>
+<%@sum_lat = 0%>
+<%@sum_lng = 0%>
+<%@room.places.each do |place|%>
+  <% @sum_lat+=place.lat%>
+   <%@sum_lng+=place.lng%>
+<%end%>
+<%@sum_lat/=count%>
+<%@sum_lng/=count%>
+    
+center.push(<%=@sum_lat%>);
+center.push(<%=@sum_lng%>);
+
+<%@room.places.each do |place|%>
+    images.push("<%=User.find(place.user_id).profile_img%>");
+<%end%>
+
+daum_map();
+    
+function daum_map(){
+  
+    var mapContainer = document.getElementById('map'), // 지도를 표시할 div  
+    mapOption = { 
+        center: new daum.maps.LatLng(center[0], center[1]), // 지도의 중심좌표
+        level: 3 // 지도의 확대 레벨
+    };
+    
+    var map = new daum.maps.Map(mapContainer, mapOption); // 지도를 생성합니다
+     
+    // 마커 이미지의 이미지 주소입니다
+    var bounds = new daum.maps.LatLngBounds();
+    for (var i = 0; i < positions.length; i ++) {
+        var imageSrc=images[i];
+        // 마커 이미지의 이미지 크기 입니다
+        var imageSize = new daum.maps.Size(35, 35); 
+        var placePosition =  new daum.maps.LatLng(parseFloat(positions[i].lat), parseFloat(positions[i].lng));
+        // // 마커 이미지를 생성합니다    
+        var markerImage = new daum.maps.MarkerImage(imageSrc, imageSize); 
+       
+        // 마커를 생성합니다
+        var marker = new daum.maps.Marker({
+            map: map, // 마커를 표시할 지도
+            position: placePosition, // 마커를 표시할 위치
+            title : positions[i].title, // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
+            image : markerImage // 마커 이미지 
+        });
+        var polyline = new daum.maps.Polyline({
+            map: map,
+            path: [
+                new daum.maps.LatLng(positions[i].lat,positions[i].lng),
+                new daum.maps.LatLng(center[0],center[1])
+                
+            ],
+            strokeWeight: 2,
+            strokeColor: '#FF00FF',
+            strokeOpacity: 0.8,
+            // strokeStyle: 'dashed'
+        });
+        bounds.extend(placePosition);
+        // if(polyLength<polyline.getLength()){
+        //     polyLength = polyline.getLength();
+        // }
+    }
+    
+    // $('#length').val(polyLength);
+        
+   
+    map.setBounds(bounds);    
+    marker = new daum.maps.Marker({
+        map: map, // 마커를 표시할 지도
+        position: new daum.maps.LatLng(center[0],center[1]), // 마커를 표시할 위치
+        title : "center", // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
+    });
+}
