@@ -133,7 +133,7 @@ class RoomController < ApplicationController
     @sum_lat/=count
     @sum_lng/=count
     
-    @likes = @room.likes.where(user_id: current_user.id)
+    @likes = @room.userlikes.where(user_id: current_user.id)
     
     @is_check = true
     @room.places.each do |place|
@@ -156,14 +156,30 @@ class RoomController < ApplicationController
   end
   
    def like_create
-        like = Like.find_by(user_id: current_user.id, place: params[:title], room_id: params[:id])
-        if like.nil?
-            Like.create(user_id: current_user.id, place: params[:title], room_id: params[:id],lat: params[:lat],lng: params[:lng],placeUrl: params[:placeUrl])
-            
-        else
-            like.destroy
-            
-        end
+     place = Room.find(params[:id]).likes.find_by(place: params[:title])
+     
+     
+     if place.nil?
+       newlike = Like.create(place: params[:title], room_id: params[:id],lat: params[:lat],lng: params[:lng],placeUrl: params[:placeUrl])
+       Userlike.create(user_id: current_user.id, room_id: params[:id], like_id: newlike.id)
+     else
+       like = Userlike.find_by(user_id: current_user.id, like_id: place.id)
+       if like.nil?
+         Userlike.create(user_id: current_user.id, room_id: params[:id], like_id: place.id)
+         place.count += 1
+         place.save
+       else
+         like.destroy
+         if place.count >1
+           place.count -= 1
+           place.save
+         else
+           place.destroy
+         end
+       end
+     end
+
+     
       respond_to do |format|
         if true
           format.js
@@ -174,7 +190,7 @@ class RoomController < ApplicationController
         end
     end
        
-  end
+end
 
     def like_result
         @likes = Room.find(params[:id]).likes
@@ -189,7 +205,11 @@ class RoomController < ApplicationController
             end
         end
         
-    end      
+    end
+    
+    def find_route
+        
+    end
   
   private
       def distance loc1, loc2

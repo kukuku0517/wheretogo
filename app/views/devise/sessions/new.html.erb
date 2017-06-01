@@ -1,36 +1,31 @@
+<!--로그인 창 -->
 
-
-<div class="container">
-   <h2>로그인</h2>
-    
-    <%= render "devise/shared/links" %>
-  
-</div>
-
-
-
-<%= form_for(resource, as: resource_name, url: session_path(resource_name), :html => {class: "ui large form"}) do |f| %>
-<div class="ui raised segment loginBox">
-  <div class="ui field">
-    <%= f.label :email, :class => 'ui left aligned header' %>
-    <%= f.email_field :email %>
-  </div>
-
-  <div class="ui field">
-    <%= f.label :name, '비밀번호', :class => 'ui left aligned header' %>
-    <%= f.password_field :password, autocomplete: "off" %>
-  </div>
-
-  <% if devise_mapping.rememberable? -%>
-    <div class= "ui checkbox">
-      <%= f.check_box :remember_me %>
-      <%= f.label :name, '기억하기' %>
+<div id="login_container"class="container">
+  <div class="row">
+    <div class="col-4 col-offset-4">
+      <h1 id="center_title">로그인</h1>
     </div>
-  <% end -%>
-
-  <div class="actions">
-    <%= f.submit "Log in", :class => 'ui fluid small yellow submit button' %>
   </div>
-<% end %>
-
-<%=link_to 'register',new_user_registration_path%>
+  <div class="row row-content">
+  <div class="col-xs-12 col-sm-10 col-sm-offset-1">
+  <%= form_for(resource, as: resource_name, url: session_path(resource_name), :html => {class: "form-horizontal", role:"form"}) do |f| %>
+    <div class="form-group">
+      <%= f.email_field :email, :class =>'col-xs-8 col-xs-offset-2 col-sm-6 col-sm-offset-3',placeholder: "이메일" %>
+    </div>
+    <div class="form-group">
+      <%= f.password_field :password, :class => 'col-xs-8 col-xs-offset-2 col-sm-6 col-sm-offset-3', autocomplete: "off",placeholder: "비밀번호" %>
+    </div>
+    <% if devise_mapping.rememberable? -%>
+      <div class= "form-group">
+        <%= f.check_box :remember_me %>
+        <%= f.label :name, '기억하기' %>
+      </div>
+    <% end %>
+    <div class="form-group">
+      <%= f.submit "로그인", :class => 'ui fluid small yellow submit button' %>
+    </div>
+  <% end %>
+  </div>
+  </div>
+  <%= render "devise/shared/links" %>
+</div>

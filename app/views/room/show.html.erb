@@ -1,66 +1,80 @@
 
-<!--참가자 각각 lat,lng,placename / 장소정하기, 방나가기 / 강퇴 -->
+     
 <div class="container">
+    <h4 id="center_title">방에 참여하고 있는 사람들</h4>
+    <div class="member_block">
     <%@room.places.each do |place|%>
-        <div class="user<%=place.user_id%>">
-            <%=form_for place,url: find_path(params[:id]),method: :get do |f|%>
-                <div class="row">
-                    <%=f.hidden_field :user_id,class: "form-control", placeholder: place.user_id %>
-                <div class="col-2"><%=User.find(place.user_id).nickname%> </div>
-                <div class="col-1">
-                    <%=f.number_field :lat, class: "lat", class: "form-control",placeholder: place.lat, step: "0.0000001"%>
-                </div>
-                <div class="col-1">
-                    <%=f.number_field :lng, class: "lng", class: "form-control",placeholder: place.lng, step: "0.0000001"%>
-                </div>
-                <div class="col-4">
-                    <%=f.text_field :placename%>
-                </div>
+        <%=form_for place,url: find_path(params[:id]),method: :get do |f|%>
+            <div class="block">
+                <span class="block_img">
+                    <%if User.find(place.user_id).profile_img == nil %>
+                        <%=image_tag "https://placehold.it/50x50",class: "profile_img img-circle"%>
+                    <%else%>
+                        <%=image_tag User.find(place.user_id).profile_img,class: "profile_img img-circle"%>
+                    <%end%>
+                </span>
                 
-                <%if place.user_id ==current_user.id%>
-                    <div class="col-2">
-                        <%=f.submit '장소 정하기', class: "btn btn-info"%>
+                <div class="block_content fixed_row">
+                    <div class="row">
+                        <%=f.hidden_field :user_id,class: "form-control", placeholder: place.user_id %>
+                        <div class="col-xs-6 col-xs-offset-1">
+                            <%=User.find(place.user_id).email%>
+                        </div>
                     </div>
-                    <div class="col-2">
-                        <%=link_to '방 나가기', destroy_self_path(place.id), class: "btn btn-info"%>
-                    </div>
+                
+                    <div class="row">
+                        <div class="col-xs-3 col-xs-offset-1">
+                            <h5 id="placename"><%= :placename %></h5>
+                        </div>
                     
-                   
-                <%end%>
-                
-                <% if @creator && place.user_id!=current_user.id %>
-                    <div class="col-2">
-                        <%=link_to '삭제', destroy_member_path(place.id), class: "btn btn-danger" %>
+                        <div class="col-xs-8">
+                            <%if place.user_id ==current_user.id%>
+                                <%=f.submit '내 스팟', class: "btn btn-info"%>
+                                <!--<button class="btn btn-info" id="GPS">GPS</button>-->
+                                <a href="#" class="btn btn-info" id="GPS">GPS</a>
+                                
+                                <%=link_to '방 나가기', destroy_self_path(place.id), class: "btn btn-info"%>
+                            <%end%>
+                            <% if @creator && place.user_id!=current_user.id %>
+                                <%=link_to '삭제', destroy_member_path(place.id), class: "btn btn-danger" %>
+                            <% end%>
+                        </div>
                     </div>
-                <% end%>
+                </div> 
+            </div> <!-- block -->
+        <%end%>
+    <%end%>
+    </div> <!-- member block -->
+    <div class="break_line"></div>
+    <div class="break_line"></div>
+    
+    <div class="row">
+        <div class="col-xs-6 col-xs-offset-3 align_center">
+            <form class="form-inline">
+                <div class="form-group">
+                    <div class="input-group">
+                      <div class="input-group-addon">링크 URL</div>
+                      <input type="text" class="form-control" id="link" placeholder="https://where-to-meet-2-dboong.c9users.io/room/show/<%=params[:id]%>">
+                    </div>
                 </div>
-            <%end%>
+            </form>
+            <span>
+                <%=image_tag 'http://www.iconsdb.com/icons/preview/black/copy-link-xxl.png',class: "clipboard-btn",:data =>{:clipboard_action => "copy",:clipboard_target => "#link"} %>
+            </span>
         </div>
-    <%end%>    
- <div class="col-1">
-<!--현재 gps로 업데이트-->
-<button id="GPS" href="javascript(0);">GPS</button>
-                    
-                    </div>
-    <!--링크주소복사-->
-    <h5 class="d-flex justify-content-center align-middle">링크 주소 : <kbd id="bar">https://where-to-meet-2-dboong.c9users.io/room/show/<%=params[:id]%></kbd>
-    <%=image_tag 'http://www.iconsdb.com/icons/preview/black/copy-link-xxl.png',size: "50",class: "clipboard-btn",:data =>{:clipboard_action => "copy",:clipboard_target => "#bar"} %>
-    </h5>
-
-    <!--카카오톡 링크 생성-->
-    <a class="d-flex justify-content-center" id="kakao-link-btn" href="javascript:;">
+    </div>
+    <a class="kakao-link-btn" href="javascript:;">
         <%= image_tag 'kakao_link' %>
     </a>
-    <!--지도-->
-    <div id="map" style="width:100%;height:350px;"></div>
     
-    <!--결과보기-->
-    <%=form_tag(result_path(params[:id]),method: :post) do %>
-       
-        <span class="d-flex justify-content-center"><%=submit_tag 'result', class: "btn btn-info btn-lg btn-block"%></span>
-    <% end %>
+    <div id="map">
+    </div>
+    <div class="break_line"></div>
+    
+    <%=link_to 'result', result_path(params[:id]), class: "btn btn-default btn-block"%>
 
-</div>
+</div> <!--container -->
+
 
 
 

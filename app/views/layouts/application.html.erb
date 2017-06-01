@@ -2,47 +2,60 @@
 <html>
 <head>
   <title>Workspace</title>
+  
+  <script src="//developers.kakao.com/sdk/js/kakao.min.js"></script>
+  <script type="text/javascript" src="//apis.daum.net/maps/maps3.js?apikey=e78e73fb03c7df3623d3f3aeaece86a3&libraries=services"></script>
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+  <link href="https://www.fontify.me/wf/6ee3874d382c6981faffc540c1135017" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/earlyaccess/hanna.css" rel="stylesheet" type="text/css">
   <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
   <%= csrf_meta_tags %>
-  
-<script src="//developers.kakao.com/sdk/js/kakao.min.js"></script>
-<script type="text/javascript" src="//apis.daum.net/maps/maps3.js?apikey=e78e73fb03c7df3623d3f3aeaece86a3&libraries=services"></script>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
 </head>
 
-<nav class="navbar navbar-toggleable-md navbar-light bg-faded">
-  <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <a class="navbar-brand" href="/"><b>울어봐</b></a>
-  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-    <div class="navbar-nav">
-     
-      <% if user_signed_in? %>
-      
-      <%=current_user.nickname%>
-      <%=image_tag current_user.profile_img, size: '50'%>
-       
-       <%= link_to 'edit',edit_user_registration_path, :method => :get, :class => 'nav-item nav-link'%>
-       
-       <%= link_to(destroy_user_session_path, :method => :delete, :class => 'nav-item nav-link') do %>
-       로그아웃<span class="sr-only">(current)</span>
-       <%end%>
-     
-         <% end %>
+ <nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/#">울어봐</a>
     </div>
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="navbar">
+        <% if user_signed_in? %>
+          <ul class="nav navbar-nav navbar-right">
+            <!-- <li><span class="nav-item"><%=current_user.id%></span></li> -->
+            <li><%=image_tag current_user.profile_img, :class => "img-circle profile_img", size: '50'%></li>
+            <li><%= link_to '프로필 변경',edit_user_registration_path, :method => :get, :class => "nav_item" %></li>
+            <li><%= link_to(destroy_user_session_path, :method => :delete, :class => "nav_item") do %>
+           로그아웃<span class="sr-only">(current)</span>
+          <%end%></li>
+         <% end %>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+  </nav>
+  <div class="wrapper">
+    <%= yield %>
   </div>
-</nav>
-
-
-<body>
-
-  
-<%= yield %>
+  <footer class="footer">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <p align=center>© Copyright 2017 Likelion</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+<!--<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>-->
 <!--<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>-->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
 
 </body>
 </html>

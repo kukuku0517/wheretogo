@@ -1,27 +1,26 @@
+<div class="row">
 <%- if devise_mapping.omniauthable? %>
-  <div>
     <%- resource_class.omniauth_providers.each do |provider| %>
       <%= link_to omniauth_authorize_path(resource_name, provider) do %>
         <%- if provider.to_s == "google_oauth2" %>
           <% provider = "google plus" %>
         <% end %>
-       
-          
-          <% if provider.to_s == "facebook" %>
-             <button class="btn btn-primary">페이스북
-          <% elsif provider.to_s == "google plus" %>
-             <button class="btn btn-danger">구글
-          <% else %>
-             <button class="btn btn-warning">카카오톡(not working)
-          <% end %>
-          계정으로 로그인</button>
-       
+        <% if provider.to_s == "facebook" %>
+          <div class="col-xs-6 col-xs-offset-3">
+             <button id="login_btn" class="btn btn-block btn-default"><h6>페이스북 계정으로 로그인</h6></button>
+          </div>
+        <% elsif provider.to_s == "google plus" %>
+          <div class="col-xs-6 col-xs-offset-3">
+            <button id="login_btn" class="btn btn-block btn-default"><h6>구글 계정으로 로그인</h6></button>
+          </div>
+        <%end%>
       <% end -%>
     <% end -%>
-  </div>
 <% end -%>
+
+<div class="col-xs-6 col-xs-offset-3">
 <%- if controller_name != 'sessions' %>
-    <%= link_to "로그인", new_session_path(resource_name) %>
+    <%= link_to "로그인", new_session_path(resource_name), :html => {class: ""} %>
 <% end -%>
 
 <%- if devise_mapping.recoverable? && controller_name != 'passwords' && controller_name != 'registrations' %>
@@ -32,10 +31,14 @@
     <%= link_to "가입하기", new_registration_path(resource_name), :name => 'test' %>
 <% end -%>
 
+</div>
+</div>
+<!-- 나중에 row 범위 밑에꺼도 wrap할 수 있도록 -->
+<!--
 <%- if devise_mapping.confirmable? && controller_name != 'confirmations' %>
   <%= link_to "Didn't receive confirmation instructions?", new_confirmation_path(resource_name) %><br />
 <% end -%>
 
 <%- if devise_mapping.lockable? && resource_class.unlock_strategy_enabled?(:email) && controller_name != 'unlocks' %>
   <%= link_to "Didn't receive unlock instructions?", new_unlock_path(resource_name) %><br />
-<% end -%>
+<% end -%> -->

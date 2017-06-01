@@ -33,6 +33,8 @@ Rails.application.routes.draw do
   get 'room/like/:id' => 'room#like',as: :like
   get 'room/like_result/:id' => 'room#like_result',as: :like_result
 
+
+get 'room/find_route/:id' => 'room#find_route',as: :find_route
   devise_for :users, :controllers => { :omniauth_callbacks => "users/omniauth_callbacks" }
   
   # The priority is based upon order of creation: first created -> highest priority.

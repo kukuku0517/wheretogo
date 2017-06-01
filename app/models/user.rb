@@ -10,7 +10,8 @@ devise :database_authenticatable, :registerable,
          :omniauthable 
   has_many :identitys
   
-  has_and_belongs_to_many :likes
+  has_many :userlikes
+  has_many :users, :through => :userlikes
   
 
 TEMP_EMAIL_PREFIX = 'change@me'  

@@ -1,4 +1,5 @@
 class Like < ActiveRecord::Base
-    has_and_belongs_to_many :users
     belongs_to :room
+    has_many :userlikes
+    has_many :users, :through => :userlikes
 end
