@@ -1,6 +1,6 @@
 
      
-<div class="container">
+<div class="container-fluid">
     <h4 id="center_title">방에 참여하고 있는 사람들</h4>
     <div class="member_block">
     <%@room.places.each do |place|%>
@@ -95,22 +95,18 @@
     Kakao.init('87e95e90db1318f284d859ffa50fed2d');
 
     Kakao.Link.createDefaultButton({
-      container: '#kakao-link-btn',
+      container: '.kakao-link-btn',
       objectType: 'feed',
       content: {
-        title: '딸기 치즈 케익',
-        description: '#케익 #딸기 #삼평동 #카페 #분위기 #소개팅',
-        imageUrl: 'http://mud-kage.kakao.co.kr/dn/Q2iNx/btqgeRgV54P/VLdBs9cvyn8BJXB3o7N8UK/kakaolink40_original.png',
+        title: '울어봐 초대',
+        description: '<%= current_user.nickname%>님의 초대입니다',
+        imageUrl: '<%=current_user.profile_img%>',
         link: {
           mobileWebUrl: 'https://where-to-meet-2-dboong.c9users.io/room/show/<%=params[:id]%>',
           webUrl: 'https://where-to-meet-2-dboong.c9users.io/room/show/<%=params[:id]%>'
         }
       },
-      social: {
-        likeCount: 286,
-        commentCount: 45,
-        sharedCount: 845
-      },
+     
       buttons: [
         {
           title: '웹으로 보기',

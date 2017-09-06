@@ -5,7 +5,7 @@ var geocoder = new daum.maps.services.Geocoder();
 <% @likes = Room.find(params[:id]).likes %>
 $('.modal-body').empty();
 <%@likes.each do |like|%>
-$('.modal-body').append('<li><%=like.place%> <%=like.count%> <a href="<%=like.placeUrl%>">사이트 보기</a> <%=link_to '길찾기',"	http://map.daum.net/link/to/#{like.place},#{like.lat},#{like.lng}"%></li>');
+$('.modal-body').append('<li><%=like.place%> <a href="<%=like.placeUrl%>">사이트 보기</a> <%=link_to '길찾기',"	http://map.daum.net/link/to/#{like.place},#{like.lat},#{like.lng}"%> 좋아요 <%=like.count%></li> ');
    
 <%end%>
 
